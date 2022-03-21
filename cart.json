@@ -1,0 +1,25 @@
+{
+  "products": [{
+    "name":"Blue Warm Pants",
+    "price":25.0,
+    "collection":"Winter"
+  },{
+    "name":"The Name of the Wind Book",
+    "price":13.5
+  },{
+    "name":"The Best Coffee - 340g",
+    "price":19.0
+  },{
+    "name":"Aluminium Beach Chair",
+    "price":15.5,
+    "collection":"Summer"
+  },{
+    "name":"Cool Gray Headphones",
+    "price":75.0,
+    "collection":"Lifestyle"
+  }],
+  "pagination": {
+    "current_page":1,
+    "per_page":5,
+    "total":16}
+}

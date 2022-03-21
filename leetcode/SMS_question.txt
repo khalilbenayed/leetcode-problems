@@ -1,0 +1,138 @@
+/******************************************************************************
+
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+#include <bits/stdc++.h>
+#include <string>
+
+
+#define DEBUG_MODE 1
+#define _DEBUG if(DEBUG_MODE)
+#define EXTRA_CREDIT 0
+
+using namespace std;
+
+int backTrackIndex(int i, string x);
+string backTrackString(string x);
+
+vector<string> segments(string message){
+    
+    // Don't create a segment if length < 160 chars
+    if(message.length() < 160){
+        vector<string> returnValue;
+        returnValue.push_back(message);
+        
+        // return vector with single entry
+        _DEBUG
+        cout<<"Single Segment: \n"<<returnValue.at(0)<<"\n";
+        
+        return returnValue;
+    }
+    
+    // Create a segment if over 160 chars
+    
+    // Initialize vars
+    // suffix length => "(x/y)" = 5 chars i.e. payload size = 160 - 5 = 155
+    int payloadSize = (160 - 5);
+    vector<string> segments;
+    string segment;
+    int segmentNumber = 1;
+    int totalSegments = message.length()/(payloadSize);
+    //  if totalSegments%155 > 0 then add another segment for leftover chars
+    if(message.length()%payloadSize){
+        totalSegments++;
+    }
+    
+    
+    
+    for(int i = 0; i < message.length(); i++){
+        
+        segment += message[i];
+        
+        if(segment.length() == (payloadSize)){
+            
+            /*
+            Extra Credit start
+            */
+            if(EXTRA_CREDIT){
+                if( (message[i] != ' ') || (message[i+1] != ' ') ){
+                i = backTrackIndex(i, segment);
+                segment = backTrackString(segment);
+                }    
+            }
+            
+            /*
+            Extra Credit end
+            */
+            
+            // Append suffix
+            segment += "(";
+            segment += to_string(segmentNumber);
+            segment += "/";
+            segment += to_string(totalSegments);
+            segment += ")";
+            
+            // Increment segmentNumber
+            segmentNumber++;
+            
+            // Add segment to vector
+            segments.push_back(segment);
+            
+            _DEBUG
+            cout<<"Segment: "<<segmentNumber<<" SegmentSize: "<<segment.length()<<"\n"<<segment<<"\n\n";
+            
+            // Empty segment variable
+            segment = "";
+        }
+    }
+    
+    return segments;
+}
+
+
+string backTrackString(string x){
+    int counter = x.length();
+    
+    for(counter; counter >= 0; counter--){
+        if(x[counter] != ' '){
+            x.erase(x.end());
+        }else {
+            break;
+        }
+    }
+    
+    return x;
+    
+}
+
+
+int backTrackIndex(int i, string x){
+    int counter = x.length();
+    
+    for(counter; counter >= 0; counter--){
+        if(x[counter] != ' '){
+            x.erase(x.end());
+            i--;
+        }else {
+            break;
+        }
+        
+    }
+    
+    return i;
+}
+
+
+
+
+int main()
+{
+    cout<<"Hello World";
+
+    return 0;
+}
