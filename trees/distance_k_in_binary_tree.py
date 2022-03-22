@@ -53,59 +53,50 @@ class Solution1(object):
     """
     @staticmethod
     def run(root, target, k):
-        stack, parents = [root], {root.val: None}
-        while len(stack) != 0:
-            curr = stack.pop()
-            if curr == target:
-                break
-            else:
-                if curr.left:
-                    stack.append(curr.left)
-                    parents[curr.left.val] = curr
-                if curr.right:
-                    stack.append(curr.right)
-                    parents[curr.right.val] = curr
+        def fn(root, k):
+            # gives the nodes that are k edges away from the root
+            if root is None:
+                return []
 
-        path = []
-        endpoint = target
-        while endpoint:
-            path.append(endpoint)
-            endpoint = parents[endpoint.val]
-
-        def bfs(root, d):
-            """Return children that are at distance d from root."""
-            if d == 0:
+            if k == 0:
                 return [root.val]
-            elif d > 0:
-                ans = []
-                if root.left:
-                    ans.extend(bfs(root.left, d-1))
-                if root.right:
-                    ans.extend(bfs(root.right, d-1))
-                return ans
 
-        ans = []
-        for i, node in enumerate(path):
-            prev = path[i-1] if i > 0 else None
-            if k-i == k:
-                nodes = bfs(node, k)
-                ans.extend(nodes)
-            elif k-i > 0:
-                if node.right == prev and node.left:
-                    nodes = bfs(node.left, k-i-1)
-                    ans.extend(nodes)
-                elif node.left == prev and node.right:
-                    nodes = bfs(node.right, k-i-1)
-                    ans.extend(nodes)
-            elif k-i == 0:
-                ans.append(node.val)
-            else:
+            result = []
+            if root.left is not None:
+                result.extend(fn(root.left, k - 1))
+            if root.right is not None:
+                result.extend(fn(root.right, k - 1))
+            return result
+
+        # now find path for the target from root
+        stack = [[root]]
+        path_to_target = None
+        while len(stack) != 0:
+            curr_path = stack.pop()
+            if curr_path[-1] == target:
+                path_to_target = curr_path
                 break
-        return ans
 
+            if curr_path[-1].left is not None:
+                stack.append(curr_path + [curr_path[-1].left])
+            if curr_path[-1].right is not None:
+                stack.append(curr_path + [curr_path[-1].right])
 
-
-
+        # now find the nodes k edges away from the target
+        result = fn(target, k)
+        n = len(path_to_target)
+        for i in range(1, min(k + 1, n)):
+            curr = path_to_target[n - i - 1]
+            if k - i == 0:
+                result.append(curr.val)
+            else:
+                # can't use the subtree the path follows
+                next_in_path = path_to_target[n - i]
+                if curr.left == next_in_path:
+                    result.extend(fn(curr.right, k - i - 1))
+                else:
+                    result.extend(fn(curr.left, k - i - 1))
+        return result
 
 
 class Solution2(object):

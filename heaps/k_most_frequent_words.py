@@ -81,7 +81,7 @@ class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
 
-    uses min head -> O(nlogk)
+    uses min heap -> O(nlogk)
     """
     @staticmethod
     def run(words, k):

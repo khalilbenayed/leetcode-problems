@@ -1,6 +1,5 @@
 """
-1: https://leetcode.com/problems/continuous-subarray-sum/
-2: https://leetcode.com/problems/subarray-sum-equals-k/
+https://leetcode.com/problems/friend-circles/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -49,25 +48,24 @@ class Solution1(object):
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(nums, k):
-        n = len(nums)
-
-        for i in range(n - 1):
-            if nums[i] == nums[i + 1] == 0:
-                return True
-        if k == 0:
-            return False
-
-        s = 0
-        m = {0: -1}
+    def run(isConnected):
+        # just find the total number of connected components
+        n = len(isConnected)
+        seen = [False] * n
+        num_components = 0
         for i in range(n):
-            s += nums[i]
-            rem = s % k
-            if (rem == 0 or rem in m) and i > m[rem]+1:
-                return True
-            if rem not in m:
-                m[rem] = i
-        return False
+            if seen[i]:
+                continue
+
+            stack = [i]
+            num_components += 1
+            while len(stack) != 0:
+                curr = stack.pop()
+                seen[curr] = True
+                for j in range(n):
+                    if isConnected[curr][j] and not seen[j]:
+                        stack.append(j)
+        return num_components
 
 
 class Solution2(object):
@@ -75,20 +73,10 @@ class Solution2(object):
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(nums, k):
-        m = {0: 1}
-        c, n, s = 0, len(nums), 0
-        for i in range(n):
-            s += nums[i]
-            if s-k in m:
-                c += m[s-k]
-            if s not in m:
-                m[s] = 1
-            else:
-                m[s] += 1
-        return c
+    def run(*args):
+        pass
 
 
-test_data = [[]]
+test_data = [[[[1,1,0],[1,1,0],[0,0,1]]], [[[1,1,0],[1,1,1],[0,1,1]]]]
 solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)
