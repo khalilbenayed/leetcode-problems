@@ -79,15 +79,34 @@ class Solution1(object):
         return True
 
 
-
-
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(*args):
-        pass
+    def run(root):
+        def fn(root):
+            if root.left is None and root.right is None:
+                return True, 1, True
+
+            if root.left is None and root.right is not None:
+                return False, 0, False
+
+            left_is_complete, left_height, left_is_full = fn(root.left)
+            if root.right is None:
+                return left_is_complete and left_height == 1, 1 + left_height, False
+            else:
+                right_is_complete, right_height, right_is_full = fn(root.right)
+                if right_height == left_height:
+                    return left_is_full and right_is_complete, 1 + left_height, left_is_full and right_is_full
+                elif right_height == left_height - 1:
+                    return left_is_complete and right_is_full, 1 + left_height, False
+                else:
+                    return False, 0, False
+
+        if root is None:
+            return True
+        return fn(root)[0]
 
 
 test_data = [[]]

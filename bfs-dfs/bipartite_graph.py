@@ -51,22 +51,26 @@ class Solution1(object):
     """
     @staticmethod
     def run(graph):
-        n = len(graph)
-        visited, to_visit = {}, {i for i in range(n)}
-        while len(to_visit) != 0:
-            queue = [(next(iter(to_visit)), 0)]
-            while len(queue) != 0:
-                (u, side) = queue.pop(0)
-                visited[u] = side
-                if u in to_visit:
-                    to_visit.remove(u)
-                for v in graph[u]:
-                    if v in visited:
-                        if side == visited[v]:
+        def isBipartite(graph) -> bool:
+            n = len(graph)
+            if n <= 2:
+                return True
+            colors = [None] * n
+            for i in range(n):
+                if colors[i] is not None:
+                    continue
+                stack = [(i, 0)]
+                while len(stack) > 0:
+                    u, color = stack.pop()
+                    colors[u] = color
+                    next_color = 0 if color == 1 else 1
+                    for v in graph[u]:
+                        if colors[v] is None:
+                            stack.append((v, next_color))
+                        elif colors[v] == color:
                             return False
-                    else:
-                        queue.append((v, (0 if side == 1 else 1)))
-        return True
+            return True
+        return isBipartite(graph)
 
 
 class Solution2(object):
