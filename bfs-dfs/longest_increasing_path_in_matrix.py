@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/next-greater-node-in-linked-list/
+https://leetcode.com/problems/longest-increasing-path-in-a-matrix/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -43,49 +43,58 @@ Write the question here
 from test_runner import TestRunner
 
 
-class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
-
-
 class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
 
-    use a stack
+    DP:
+        dp[i][j] = longest increasing path, longest decreasing path
     """
     @staticmethod
-    def run(head):
-        curr = head.next
-        i = 1
-        stack = [head.val]
-        ans = []
-        while curr:
-            j = i
-            while len(stack) != 0 and stack[-1] < curr.val:
-                stack.pop()
-                j -= 1
-                ans[j] = curr.val
-            stack.append(curr.val)
-            ans.append(0)
-            i += 1
-        return ans
+    def run(matrix):
+        mem = {}
+        m, n = len(matrix), len(matrix[0])
+
+        def fn(i, j):
+            # return length of longest increasing path starting from [i,j]
+            if (i, j) in mem:
+                return mem[(i, j)]
+
+            res = 1
+            for a, b in directions:
+                if 0 <= i + a < m and 0 <= j + b < n and matrix[i + a][j + b] > matrix[i][j]:
+                    res = max(res, 1 + fn(i + a, j + b))
+            mem[(i, j)] = res
+            return res
+
+        return max([fn(i, j) for i in range(m) for j in range(n)])
 
 
-
-
+directions = ((1, 0), (0, 1), (-1, 0), (0, -1))
 
 
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    DFS with dp
+    dp[i][j]: longest increasing sequence from (i, j)
     """
     @staticmethod
-    def run(*args):
+    def run(matrix):
         pass
 
 
-test_data = [[]]
+test_data = [[[
+  [9,9,4],
+  [6,6,8],
+  [2,1,1]
+]], [[
+  [3,4,5],
+  [3,2,6],
+  [2,2,1]
+]], [[[7,8,9],
+      [9,7,6],
+      [7,2,3]]], [[[1,2]]]]
 solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)

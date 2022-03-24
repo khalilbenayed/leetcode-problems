@@ -78,7 +78,7 @@ class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
 
-    At every node, keep track of the max ancestor
+    At every node, keep track of the min and max ancestors
     """
     @staticmethod
     def run(root):
@@ -86,25 +86,23 @@ class Solution2(object):
             return 0
 
         stack = [(root, None, None)]
-        max_diff = 0
+        res = 0
         while len(stack) != 0:
             node, min_ancestor, max_ancestor = stack.pop()
-            if min_ancestor is None:
+            if min_ancestor is None:  # max_ancestor must also be none in this case
                 if node.left is not None:
-                    stack.append((node.left, node, node))
+                    stack.append((node.left, node.val, node.val))
                 if node.right is not None:
-                    stack.append((node.right, node, node))
+                    stack.append((node.right, node.val, node.val))
             else:
-                max_diff = max(max_diff, abs(node.val - min_ancestor.val), abs(node.val - max_ancestor.val))
+                res = max(res, abs(node.val - min_ancestor), abs(node.val - max_ancestor))
+                min_ancestor = min(node.val, min_ancestor)
+                max_ancestor = max(node.val, max_ancestor)
                 if node.left is not None:
-                    stack.append((node.left,
-                                  node if node.val < min_ancestor.val else min_ancestor,
-                                  node if node.val > max_ancestor.val else max_ancestor))
+                    stack.append((node.left, min_ancestor, max_ancestor))
                 if node.right is not None:
-                    stack.append((node.right,
-                                  node if node.val < min_ancestor.val else min_ancestor,
-                                  node if node.val > max_ancestor.val else max_ancestor))
-        return max_diff
+                    stack.append((node.right, min_ancestor, max_ancestor))
+        return res
 
 
 test_data = [[]]

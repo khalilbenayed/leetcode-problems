@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/?fbclid=IwAR0ChuUeNk_ZxjUzWAPBmZeazDlQELSn6PzN_T8VboHG9Ggw0juBBim4QWY
+https://leetcode.com/problems/longest-repeating-character-replacement/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -39,47 +39,29 @@ Write the question here
     Solution 2:
     ...
 """
-
+from collections import defaultdict
 from test_runner import TestRunner
 
 
 class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
-    1) run dfs
-    2) when find p or q save the path from root
-    3) select min from intersection
+
+    sliding window
     """
     @staticmethod
-    def find_lca(root, p, q):
-        p_path, q_path, path, visited = [], [], [], set()
-        stack = [root]
-        while len(stack):
-            cur = stack.pop()
-            path.append(cur)
-            if cur == p:
-                p_path = [v for v in path]
-            if cur == q:
-                q_path = [v for v in path]
-            if cur.left:
-                stack.append(cur.left)
-            if cur.right:
-                stack.append(cur.right)
-            while len(path):
-                cur = path[-1]
-                if (cur.left is None or cur.left in visited) and (cur.right is None or cur.right in visited):
-                    visited.add(cur)
-                    path.pop()
-                else:
-                    break
-        i = 0
-        while i < min(len(p_path), len(q_path)) and p_path[i] == q_path[i]:
-            i += 1
-        return p_path[i-1]
+    def run(s, k):
+        left, max_count = 0, 0
+        dic = defaultdict(int)
 
-
-
-
+        for right, char in enumerate(s):
+            dic[char] += 1
+            while right - left > max_count + k:
+                dic[s[left]] -= 1
+                left += 1
+            max_count = max(max_count, dic[char])
+            print(left, right, dic, max_count)
+        return min(len(s), max_count + k)
 
 
 class Solution2(object):
@@ -87,10 +69,17 @@ class Solution2(object):
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(*args):
-        pass
+    def run(s, k):
+        count = defaultdict(int)
+        left, max_count = -1, 0
+        for right, char in enumerate(s):
+            count[char] += 1
+            while right - left > max(count.values()) + k:
+                left += 1
+                count[s[left]] -= 1
+            max_count = max(max_count, right-left)
+        return max_count
 
-
-test_data = [[]]
-solutions = [Solution1.find_lca, Solution2.run]
+test_data = [["ababb", 2], ["aababba", 1], ["abaa", 0]]
+solutions = [Solution1.run]
 TestRunner.run(solutions, test_data)

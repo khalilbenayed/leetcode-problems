@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/longest-repeating-character-replacement/
+https://leetcode.com/problems/next-greater-node-in-linked-list/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -43,36 +43,57 @@ Write the question here
 from test_runner import TestRunner
 
 
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+
 class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
 
-    sliding window
+    use a stack
     """
     @staticmethod
-    def run(s, k):
-        left, max_count = 0, 0
-        dic = {}
-
-        for right, char in enumerate(s):
-            dic[char] = dic[char] + 1 if char in dic else 1
-            while right - left > max_count + k:
-                dic[s[left]] -= 1
-                left += 1
-            max_count = max(max_count, dic[char])
-            print(left, right, dic, max_count)
-        return min(len(s), max_count + k)
+    def run(head):
+        curr = head.next
+        i = 1
+        stack = [head.val]
+        ans = []
+        while curr:
+            j = i
+            while len(stack) != 0 and stack[-1] < curr.val:
+                stack.pop()
+                j -= 1
+                ans[j] = curr.val
+            stack.append(curr.val)
+            ans.append(0)
+            i += 1
+        return ans
 
 
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    pretty much same as above, but maybe easier to understand?
     """
     @staticmethod
-    def run(*args):
-        pass
+    def run(head):
+        stack, ans = [], []
+        curr, i = head, 0
+        while curr is not None:
+            while len(stack) != 0 and curr.val > stack[-1][0]:
+                val, index = stack.pop()
+                ans[index] = curr.val
+            stack.append((curr.val, i))
+            ans.append(0)
+            i += 1
+            curr = curr.next
+        return ans
 
 
-test_data = [["ababb", 2], ["aababba", 1], ["abaa", 0]]
-solutions = [Solution1.run]
+test_data = [[]]
+solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)
