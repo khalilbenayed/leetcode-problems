@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/maximum-side-length-of-a-square-with-sum-less-than-or-equal-to-threshold/
+s
 
 Max duration per problem:
     6 sessions of 25 minutes

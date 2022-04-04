@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/largest-rectangle-in-histogram/
+https://leetcode.com/problems/loud-and-rich/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -47,18 +47,37 @@ class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
 
-    Brute force: O(n^2)
+    DP:
+        - first construct directed graph of richness: u -> v means v is richer than u
+        - use cache to store results for each vertex
+        - for each vertex, result is min out of every neighbour
     """
     @staticmethod
-    def run(heights):
-        n = len(heights)
-        max_area = 0
-        for i in range(n):
-            min_height = heights[i]
-            for j in range(i, n):
-                min_height = min(min_height, heights[j])
-                max_area = max(max_area, min_height * (j - i + 1))
-        return max_area
+    def run(richer, quiet):
+        graph = defaultdict(list)
+        for u, v in richer:
+            graph[v].append(u)
+
+        dp = {}
+
+        def fn(x):
+            # returns answer for node x
+            if len(graph[x]) == 0:
+                return x
+
+            if x in dp:
+                return dp[x]
+
+            ans = x
+            for neighbour in graph[x]:
+                candidate = fn(neighbour)
+                if quiet[candidate] < quiet[ans]:
+                    ans = candidate
+
+            dp[x] = ans
+            return ans
+
+        return [fn(x) for x in range(len(quiet))]
 
 
 class Solution2(object):
@@ -66,26 +85,10 @@ class Solution2(object):
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(heights):
-        max_area = 0
-        stack = []
-
-        for i, height in enumerate(heights):
-            j, area = i, 0
-            while len(stack) != 0 and height < stack[-1][1]:
-                j, h = stack.pop()
-                area = max(area, (i-j) * h)
-            max_area = max(max_area, area)
-            stack.append((j, height))
-
-        area = 0
-        while len(stack) != 0:
-            j, h = stack.pop()
-            area = max(area, h * (len(heights) - j))
-
-        return max(max_area, area)
+    def run(*args):
+        pass
 
 
-test_data = [[[2, 1, 5, 6, 2, 3]]]
+test_data = [[[[1,0],[2,1],[3,1],[3,7],[4,3],[5,3],[6,3]], [3,2,5,4,6,1,7,0]]]
 solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)

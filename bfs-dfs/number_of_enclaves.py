@@ -48,49 +48,47 @@ directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
 class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    Explore all lands and count the cells in islands
     """
 
     @staticmethod
     def num_enclaves(grid):
-        if len(grid) == 0:
-            return 0
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         m, n = len(grid), len(grid[0])
 
-        island_cells = set()
-        continent_cells = set()
-
-        def explore_land(x, y):
-            visited = {(x, y)}
+        def explore(x, y):
+            # cell (x, y) is a land cell
+            # explore the whole land and return number of cells if cannot reach the boundary
             stack = [(x, y)]
-            is_island = True
+            reached_boundary = False
+            num_land_cells = 0
             while len(stack) != 0:
-                curr_x, curr_y = stack.pop()
-                visited.add((curr_x, curr_y))
+                a, b = stack.pop()
+                if grid[a][b] == 2:
+                    # already seen so can skip this
+                    continue
+                num_land_cells += 1
+                # mark cell as seen
+                grid[a][b] = 2
+                for i, j in directions:
+                    if a + i in {-1, m} or b + j in {-1, n}:
+                        reached_boundary = True
+                    elif grid[a + i][b + j] == 1:
+                        stack.append((a + i, b + j))
+            return num_land_cells if not reached_boundary else 0
 
-                for a, b in directions:
-                    if curr_x+a < 0 or curr_x+a >= m or curr_y+b < 0 or curr_y+b >= n:
-                        is_island = False
-                        continue
-
-                    if grid[curr_x+a][curr_y+b] and (curr_x+a, curr_y+b) not in visited:
-                        stack.append((curr_x+a, curr_y+b))
-            return visited, is_island
-
-        for i in range(m):
-            for j in range(n):
-                val = grid[i][j]
-                if val == 1 and (i, j) not in island_cells | continent_cells:
-                    explored_cells, is_island = explore_land(i, j)
-                    if is_island:
-                        island_cells |= explored_cells
-                    else:
-                        continent_cells |= explored_cells
-        return len(island_cells)
+        return sum([explore(x, y) for x in range(m) for y in range(n) if grid[x][y] == 1])
 
 
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    Faster:
+    Explore lands by the edges and turn the cells to 0s
+    The return the sum of the grid
+
     """
     @staticmethod
     def num_enclaves(grid):

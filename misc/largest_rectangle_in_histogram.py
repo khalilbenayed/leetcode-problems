@@ -1,6 +1,5 @@
 """
-https://leetcode.com/problems/get-the-maximum-score/
-
+j
 Max duration per problem:
     6 sessions of 25 minutes
     3 consecutive days
@@ -41,36 +40,24 @@ Write the question here
 """
 
 from test_runner import TestRunner
-from collections import defaultdict
 
 
 class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    Brute force: O(n^2)
     """
     @staticmethod
-    def run(nums1, nums2):
-        n1, n2 = len(nums1), len(nums2)
-        ans = sum1 = sum2 = 0
-        i, j = n1-1, n2-1
-        while i >= 0 and j >= 0:
-            print(i, j, sum1, sum2, ans)
-            if nums1[i] > nums2[j]:
-                sum1 += nums1[i]
-                i -= 1
-            elif nums2[j] > nums1[i]:
-                sum2 += nums2[j]
-                j -= 1
-            else:  # nums1[i] == nums2[j]
-                ans += max(sum1 + nums1[i], sum2 + nums2[j])
-                sum1 = sum2 = 0
-                i -= 1
-                j -= 1
-        if i >= 0:
-            ans += max(sum1 + sum(nums1[:i+1]), sum2)
-        if j >= 0:
-            ans += max(sum1, sum2 + sum(nums2[:j+1]))
-        return ans
+    def run(heights):
+        n = len(heights)
+        max_area = 0
+        for i in range(n):
+            min_height = heights[i]
+            for j in range(i, n):
+                min_height = min(min_height, heights[j])
+                max_area = max(max_area, min_height * (j - i + 1))
+        return max_area
 
 
 class Solution2(object):
@@ -78,27 +65,26 @@ class Solution2(object):
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(*args):
-        pass
+    def run(heights):
+        max_area = 0
+        stack = []
+
+        for i, height in enumerate(heights):
+            j, area = i, 0
+            while len(stack) != 0 and height < stack[-1][1]:
+                j, h = stack.pop()
+                area = max(area, (i-j) * h)
+            max_area = max(max_area, area)
+            stack.append((j, height))
+
+        area = 0
+        while len(stack) != 0:
+            j, h = stack.pop()
+            area = max(area, h * (len(heights) - j))
+
+        return max(max_area, area)
 
 
-test_data = [[[2,4,5,8,10], [4,6,8,9]]]
+test_data = [[[2, 1, 5, 6, 2, 3]]]
 solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)
-
-
-
-
-"""
-[7, 7, 0],
-[-4, -7, 7],
-[-4, 0, -2],
-[-8, -5, 6]
-
-[7, 14, 14],
-[3, 3, 10],
-[-1, -1, 4],
-[-9, -14, -3]
-
-[1,0,2,2]
-"""

@@ -39,53 +39,52 @@ Write the question here
     Solution 2:
     ...
 """
-from collections import defaultdict
 
 
 class TrieNode:
-
     def __init__(self):
-        self.children = defaultdict()
-        self.val = 0
+        self.children = {}
+        self.sum = 0
 
 
 class Trie:
-
     def __init__(self):
-        self.map = {}
         self.root = TrieNode()
 
-    def insert(self, word, val):
-        root = self.root
-        old_val = self.map.get(word, 0)
+    def insert(self, key, new_val, old_val=0):
+        curr = self.root
+        for char in key:
+            curr.sum += new_val - old_val
+            if char not in curr.children:
+                curr.children[char] = TrieNode()
+            curr = curr.children[char]
+        curr.sum += new_val - old_val
 
-        for char in word:
-            if char not in root.children:
-                root.children[char] = TrieNode()
-            root = root.children[char]
-            root.val += val - old_val
-
-        self.map[word] = val
-
-    def search_prefix(self, prefix):
-        root = self.root
-        for char in prefix:
-            root = root.children[char]
-
-        return root.val
+    def search(self, key):
+        curr = self.root
+        for char in key:
+            if char not in curr.children:
+                return 0
+            curr = curr.children[char]
+        return curr.sum
 
 
 class MapSum:
+
     def __init__(self):
-        """Initialize your data structure here."""
         self.trie = Trie()
+        self.map = {}
 
-    def insert(self, key, val):
-        self.trie.insert(key, val)
+    def insert(self, key: str, val: int) -> None:
+        if key in self.map:
+            self.trie.insert(key, val, self.map[key])
+            self.map[key] = val
+        else:
+            self.trie.insert(key, val)
+            self.map[key] = val
 
-    def sum(self, prefix):
-        sum = self.trie.search_prefix(prefix)
-        return sum
+    def sum(self, prefix: str) -> int:
+        return self.trie.search(prefix)
 
 
 obj = MapSum()

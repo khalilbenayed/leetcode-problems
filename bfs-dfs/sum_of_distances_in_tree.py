@@ -40,6 +40,7 @@ Write the question here
     ...
 """
 
+from collections import defaultdict
 from test_runner import TestRunner
 
 
@@ -51,24 +52,27 @@ class Solution1(object):
     """
     @staticmethod
     def run(n, edges):
-        # first process the graph
-        graph = [[] for _ in range(n)]
+        tree = defaultdict(list)
         for u, v in edges:
-            graph[u].append(v)
-            graph[v].append(u)
+            tree[u].append(v)
+            tree[v].append(u)
 
-        # root the tree at 0 and run dfs with memo
-        memo = {}
+        mem = {}
 
         def dfs(u, source=None):
-            distances, nodes_covered = 0, 1
-            for v in graph[u]:
+            # return the sum of distances from u as root without going through source
+            # also return number of nodes reachable
+            if (u, source) in mem:
+                return mem[(u, source)]
+
+            distances, nodes_reached = 0, 1
+            for v in tree[u]:
                 if source is None or v != source:
-                    neighbours_distances, neighbour_nodes_covered = memo[(v, u)] if (v, u) in memo else dfs(v, u)
-                    nodes_covered += neighbour_nodes_covered
-                    distances += neighbour_nodes_covered + neighbours_distances
-            memo[(u, source)] = (distances, nodes_covered)
-            return distances, nodes_covered
+                    distances1, nodes_reached1 = dfs(v, u)
+                    distances += distances1 + nodes_reached1
+                    nodes_reached += nodes_reached1
+            mem[(u, source)] = (distances, nodes_reached)
+            return distances, nodes_reached
 
         return [dfs(u)[0] for u in range(n)]
 

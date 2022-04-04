@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/minimum-number-of-vertices-to-reach-all-nodes/
+https://leetcode.com/problems/path-with-maximum-probability/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -39,39 +39,40 @@ Write the question here
     Solution 2:
     ...
 """
-
+import heapq
+from collections import defaultdict
 from test_runner import TestRunner
 
 
 class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    A* search
     """
     @staticmethod
-    def run(n, edges):
-        # first run topological sort to order to vertices
-        graph = {u: {v for v, uu in edges if u == uu} for u in range(n)}
-        top_order = []
-        while len(top_order) != n:
-            for vertex, neighbours in graph.items():
-                if len(neighbours) == 0:
-                    top_order.append(vertex)
-                    del graph[vertex]
-                    for v in graph.keys():
-                        if vertex in graph[v]:
-                            graph[v].remove(vertex)
+    def run(n, edges, probs, s, t):
+        graph = defaultdict(dict)
+        for i, (u, v) in enumerate(edges):
+            graph[u][v] = probs[i]
+            graph[v][u] = probs[i]
 
-        # now use topological order to solve problem
-        graph = {u: {v for uu, v in edges if u == uu} for u in range(n)}
-        vertices, reach = [], set()
-        for u in top_order:
-            reach |= graph[u]
-            if u not in reach:
-                vertices.append(u)
-                reach.add(u)
-            print(u, graph[u], reach)
-            if len(reach) == n:
-                return vertices
+        frontier = [(-1, s)]
+        seen = set()
+        while len(frontier) != 0:
+            neg_prob, u = heapq.heappop(frontier)
+
+            if u == t:
+                return -neg_prob
+
+            if u in seen:
+                continue
+
+            seen.add(u)
+            for v, prob in graph[u].items():
+                if v not in seen:
+                    heapq.heappush(frontier, (neg_prob * prob, v))
+        return 0
 
 
 class Solution2(object):
@@ -79,15 +80,13 @@ class Solution2(object):
     Details about it's time and space complexity. what makes it a good solution?
     """
     @staticmethod
-    def run(n, edges):
-        s = {v for _, v in edges}
-        ans = []
-        for v in range(n):
-            if v not in s:
-                ans.append(v)
-        return ans
+    def run(n, edges, probs, s, t):
+        pass
 
 
-test_data = [[6, [[0,1],[0,2],[2,5],[3,4],[4,2]]], [5, [[0,1],[2,1],[3,1],[1,4],[2,4]]]]
+test_data = [[3, [[0,1],[1,2],[0,2]], [0.5,0.5,0.2], 0, 2],
+             [3, [[0,1],[1,2],[0,2]], [0.5,0.5,0.3], 0, 2],
+             [3, [[0,1]], [0.5], 0, 2],
+             [5, [[1,4],[2,4],[0,4],[0,3],[0,2],[2,3]], [0.37,0.17,0.93,0.23,0.39,0.04], 3, 4]]
 solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)

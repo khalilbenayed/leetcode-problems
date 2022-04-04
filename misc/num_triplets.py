@@ -40,6 +40,7 @@ Write the question here
     ...
 """
 from collections import Counter
+from math import comb
 from test_runner import TestRunner
 
 
@@ -66,11 +67,26 @@ class Solution1(object):
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    This one is faster
     """
     @staticmethod
-    def run(*args):
-        pass
+    def run(nums1, nums2):
+        def fn(nums1, nums2):
+            counter1 = Counter([num ** 2 for num in nums1])
+            counter2 = Counter(nums2)
+            triplets = {}
+            for target, target_count in counter1.items():
+                for num, num_count in counter2.items():
+                    if target == (num ** 2):
+                        triplets[(target, num, num)] = target_count * comb(num_count, 2)
+                    elif target % num == 0 and target // num in counter2:
+                        triplets[
+                            (target, min(num, target // num), max(num, target // num))] = target_count * num_count * \
+                                                                                          counter2[target // num]
+            return sum(triplets.values())
 
+        return fn(nums1, nums2) + fn(nums2, nums1)
 
 test_data = [[[7,4], [5,2,8,9]], [[1,1], [1,1,1]], [[7,7,8,3], [1,2,9,7]], [[4,7,9,11,23], [3,5,1024,12,18]]]
 solutions = [Solution1.run, Solution2.run]

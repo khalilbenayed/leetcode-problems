@@ -1,5 +1,5 @@
 """
-https://leetcode.com/problems/loud-and-rich/
+https://leetcode.com/problems/minimum-number-of-vertices-to-reach-all-nodes/
 
 Max duration per problem:
     6 sessions of 25 minutes
@@ -39,7 +39,7 @@ Write the question here
     Solution 2:
     ...
 """
-
+from collections import defaultdict
 from test_runner import TestRunner
 
 
@@ -47,59 +47,33 @@ class Solution1(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
 
-    DP:
-        - first construct directed graph of richness: u -> v means v is richer than u
-        - use cache to store results for each vertex
-        - for each vertex, result is min out of every neighbour
+    Find nodes which have no incoming edges.
     """
     @staticmethod
-    def run(richer, quiet):
-        n = len(quiet)
-        graph = {v: [] for v in range(n)}
-        for u, v in richer:
-            graph[v].append(u)
+    def run(n, edges):
+        in_graph = defaultdict(list)
+        for u, v in edges:
+            in_graph[v].append(u)
 
-        dp = {}
-
-        def quietest(v):
-            # print('call:', v)
-            if len(graph[v]) == 0:
-                return v
-            if v in dp:
-                return dp[v]
-
-            best, quietness = v, quiet[v]
-            for u in graph[v]:
-                if best is None and quietness is None:
-                    best = quietest(u)
-                    quietness = quiet[best]
-                else:
-                    temp_vertex = quietest(u)
-                    temp_quietness = quiet[temp_vertex]
-                    if temp_quietness < quietness:
-                        best, quietness = temp_vertex, temp_quietness
-
-            dp[v] = best
-            return best
-        #
-        # print(quietest(7))
-
-        ans = [0] * n
-        for v in range(n):
-            ans[v] = quietest(v)
-
-        return ans
+        return [u for u in range(n) if u not in in_graph]
 
 
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    Same as above but different implementation
     """
     @staticmethod
-    def run(*args):
-        pass
+    def run(n, edges):
+        s = {v for _, v in edges}
+        ans = []
+        for v in range(n):
+            if v not in s:
+                ans.append(v)
+        return ans
 
 
-test_data = [[[[1,0],[2,1],[3,1],[3,7],[4,3],[5,3],[6,3]], [3,2,5,4,6,1,7,0]]]
+test_data = [[6, [[0,1],[0,2],[2,5],[3,4],[4,2]]], [5, [[0,1],[2,1],[3,1],[1,4],[2,4]]]]
 solutions = [Solution1.run, Solution2.run]
 TestRunner.run(solutions, test_data)
