@@ -68,6 +68,7 @@ class Solution1(object):
         return count
 
 
+
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
