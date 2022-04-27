@@ -47,59 +47,46 @@ class Solution1(object):
     Details about it's time and space complexity. what makes it a good solution?
 
     brute force: compute height for every node as root
+    not fast enough
     """
     @staticmethod
     def run(n, edges):
-        graph = {}
+        graph = defaultdict(list)
         for u, v in edges:
-            if u in graph:
-                graph[u].append(v)
-            else:
-                graph[u] = [v]
-            if v in graph:
-                graph[v].append(u)
-            else:
-                graph[v] = [u]
+            graph[u].append(v)
+            graph[v].append(u)
 
         def dfs(root):
-            stack = [(root, 1)]
-            visited = set()
-            max_height = 1
+            stack = [(root, 0)]
+            seen = [False] * n
+            max_height = 0
             while len(stack) != 0:
-                curr, height = stack.pop()
-                visited.add(curr)
+                u, height = stack.pop()
+                seen[u] = True
                 max_height = max(max_height, height)
-                for neighbour in graph[curr]:
-                    if neighbour not in visited:
-                        stack.append((neighbour, height + 1))
+                for v in graph[u]:
+                    if not seen[v]:
+                        stack.append((v, height + 1))
             return max_height
-        dic = {}
-        for node in range(n):
-            height = dfs(node)
-            if height in dic:
-                dic[height].append(node)
-            else:
-                dic[height] = [node]
-        return dic[min(dic.keys())]
+
+        heights = defaultdict(list)
+        for root in range(n):
+            heights[dfs(root)].append(root)
+        return heights[min(heights.keys())]
 
 
 class Solution2(object):
     """
     Details about it's time and space complexity. what makes it a good solution?
+
+    Find longest path in this tree
     """
     @staticmethod
     def run(n, edges):
-        # first find longest path in this tree
-        graph = {}
+        graph = defaultdict(list)
         for u, v in edges:
-            if u in graph:
-                graph[u].append(v)
-            else:
-                graph[u] = [v]
-            if v in graph:
-                graph[v].append(u)
-            else:
-                graph[v] = [u]
+            graph[u].append(v)
+            graph[v].append(u)
 
         def bfs(root):
             queue = [(root, 1)]
